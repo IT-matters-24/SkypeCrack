@@ -13,10 +13,6 @@
         </File>
     </appenders>
     <loggers>
-        <!-- additivity属性用不好, 用false就行了吧-->
-        <logger name="com.bjut.Log4jTest" level="error" additivity="false">
-            <appender-ref ref="ConsoleDebug"/>
-        </logger>
         <root level="debug">
             <appender-ref ref="ConsoleDebug"/>
             <!--<appender-ref ref="FileError"/>-->

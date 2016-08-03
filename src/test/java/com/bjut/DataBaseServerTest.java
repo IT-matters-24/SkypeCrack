@@ -1,13 +1,11 @@
 package com.bjut;
 
+import com.bjut.bean.UserInfoBean;
 import junit.framework.Assert;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -19,8 +17,6 @@ public class DataBaseServerTest {
     Path userInfoFile = Paths.get("jyc1992928.ser");
     @Test
     public void testPath() {
-        Path userInfoFile = Paths.get("jyc1992928.ser");
-        Path userInfoFile1 = Paths.get("jyc19929dd28.ser");
 
         logger.trace("我是trace信息");
         logger.debug("我是debug信息");
@@ -31,22 +27,17 @@ public class DataBaseServerTest {
     }
 
     @Test
-    public void testCreateFile() {
-        String userName = "jyc1992928";
-        new Thread(new DataBaseServer(null, userName)).start();
-        Path userInfoFile = Paths.get("jyc1992928.ser");
-        Assert.assertTrue(Files.exists(userInfoFile));
+    public void testFile() {
+        DataBaseServer dataBaseServer=new DataBaseServer(null,"jyc1992928");
+        dataBaseServer.createUserFile();
+        UserInfoBean userInfo=dataBaseServer.readUserFile();
+        Assert.assertEquals(userInfo.getEnd(),0);
+        userInfo.setEnd(10);
+        dataBaseServer.writeUserFile(userInfo);
+        userInfo=dataBaseServer.readUserFile();
+        Assert.assertEquals(userInfo.getEnd(),10);
+
     }
 
-    @Test
-    public void testReadFile() {
-        UserInfo curUser=null;
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(userInfoFile.toFile()))) {
-            curUser = (UserInfo) ois.readObject();
-            curUser.setEnd(1);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        Assert.assertEquals(curUser.getEnd(),1);
-    }
+
 }

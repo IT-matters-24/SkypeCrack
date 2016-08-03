@@ -1,6 +1,7 @@
 package com.bjut;
 
 
+import com.bjut.bean.UserInfoBean;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,9 +18,8 @@ import java.nio.file.Paths;
 public class DataBaseServer implements Runnable {
     private static Logger logger = LogManager.getLogger(DataBaseServer.class);
     private Path userDB;
-    private Path userInfoFile;      //每个用户生成一个{userName}.seq
-
-    private int end;                //读取到的最大数据
+    private int end;                //last line have read
+    private Path userInfoFile;      //store 'end' in {userName}.seq file for each user
 
 
     public DataBaseServer(Path userDB, String userName) {
@@ -28,39 +28,45 @@ public class DataBaseServer implements Runnable {
 
     }
 
+     void createUserFile() {
 
-    @Override
-    public void run() {
-        logger.debug("当前扫描的数据库:" + userDB);
-        UserInfo curUser = null;
-
-        //第一次使用就创建
-        if (Files.notExists(userInfoFile)) {
-            try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(userInfoFile.toFile()))) {
-                Files.createFile(userInfoFile);
-                out.writeObject(curUser = new UserInfo(0));
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(userInfoFile.toFile()))) {
+            out.writeObject(new UserInfoBean(0));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
 
+    UserInfoBean readUserFile() {
+        UserInfoBean curUser = null;
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(userInfoFile.toFile()))) {
-            curUser = (UserInfo) ois.readObject();
-            curUser.setEnd(1);
+            curUser = (UserInfoBean) ois.readObject();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return curUser;
+    }
 
-        while (!Thread.currentThread().interrupted()) {
-
-        }
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(userInfoFile.toFile()));) {
+     void writeUserFile(UserInfoBean curUser) {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(userInfoFile.toFile()))) {
             out.writeObject(curUser);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    @Override
+    public void run()  {
+        logger.debug("scanning DB:" + userDB);
+        if (Files.notExists(userInfoFile)) {
+            createUserFile();
+        }
+        UserInfoBean curUser = readUserFile();
+
+        //todo scannging db with the help of userFile
+        while (!Thread.currentThread().interrupted()) {
+
+        }
+        writeUserFile(curUser);
     }
 }
