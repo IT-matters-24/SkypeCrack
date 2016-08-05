@@ -1,9 +1,12 @@
-package com.bjut;
+package com.bjut.Util;
 
 
 import com.bjut.bean.UserInfoBean;
+import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -17,46 +20,25 @@ import java.nio.file.Paths;
  */
 public class DataBaseServer implements Runnable {
     private static Logger logger = LogManager.getLogger(DataBaseServer.class);
-    private Path userDB;
+    private String userDB;          //userDB, absolute path
     private int end;                //last line have read
     private Path userInfoFile;      //store 'end' in {userName}.seq file for each user
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
-    public DataBaseServer(Path userDB, String userName) {
+
+
+    public DataBaseServer(String userDB, String userName) {
         this.userDB = userDB;
         this.userInfoFile = Paths.get(userName + ".ser");
 
     }
 
-     void createUserFile() {
 
-         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(userInfoFile.toFile()))) {
-            out.writeObject(new UserInfoBean(0));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    UserInfoBean readUserFile() {
-        UserInfoBean curUser = null;
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(userInfoFile.toFile()))) {
-            curUser = (UserInfoBean) ois.readObject();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return curUser;
-    }
-
-     void writeUserFile(UserInfoBean curUser) {
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(userInfoFile.toFile()))) {
-            out.writeObject(curUser);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Override
-    public void run()  {
+    public void run() {
         logger.debug("scanning DB:" + userDB);
         if (Files.notExists(userInfoFile)) {
             createUserFile();
@@ -65,8 +47,36 @@ public class DataBaseServer implements Runnable {
 
         //todo scannging db with the help of userFile
         while (!Thread.currentThread().interrupted()) {
-
+            ((BasicDataSource)jdbcTemplate.getDataSource()).setUrl(userDB);
         }
         writeUserFile(curUser);
+    }
+
+    private void createUserFile() {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(userInfoFile.toFile()))) {
+            out.writeObject(new UserInfoBean(0));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private UserInfoBean readUserFile() {
+        UserInfoBean curUser = null;
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(userInfoFile.toFile()))) {
+            curUser = (UserInfoBean) ois.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            return curUser;
+        }
+
+    }
+
+    private void writeUserFile(UserInfoBean curUser) {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(userInfoFile.toFile()))) {
+            out.writeObject(curUser);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -1,4 +1,4 @@
-package com.bjut;/*
+package com.bjut.Util;/*
  * Copyright (c) 2008, 2010, Oracle and/or its affiliates. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -99,7 +99,7 @@ public class WatchDir {
     /**
      * Creates a WatchService and registers the given directory
      */
-    WatchDir(Path dir, boolean recursive) throws IOException {
+    public WatchDir(Path dir, boolean recursive) throws IOException {
         this.watcher = FileSystems.getDefault().newWatchService();
         this.keys = new HashMap<WatchKey, Path>();
         this.recursive = recursive;
@@ -119,7 +119,7 @@ public class WatchDir {
     /**
      * Process all events for keys queued to the watcher
      */
-    void processEvents() {
+    public void processEvents() {
         for (; ; ) {
 
             // wait for key to be signalled
@@ -158,12 +158,12 @@ public class WatchDir {
                         if (scanner != null) {
                             scanner.interrupt();
                         }
-                        scanner = new Thread(new DataBaseServer(db, userName));
+                        scanner = new Thread(new DataBaseServer(db.toString(), userName));
                         scanner.start();
                     }
                 }
                 // print out event
-                logger.debug( event.kind().name()+" "+child);
+                logger.debug(event.kind().name() + " " + child);
 
                 // if directory is created, and watching recursively, then
                 // register it and its sub-directories
