@@ -1,6 +1,7 @@
 package com.bjut;
 
-import com.bjut.Util.WatchDir;
+import com.bjut.util.WatchDir;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -10,10 +11,13 @@ import java.nio.file.Paths;
  */
 public class Main {
     public static void main(String[] args) throws Exception {
-        String SkypeDataPath=System.getenv("APPDATA")+"\\Skype";
+       // System.out.println(Thread.currentThread().getContextClassLoader().getResource("") );
+         new ClassPathXmlApplicationContext("applicationContext.xml");
+        String SkypeDataPath = System.getenv("APPDATA") + "\\Skype";
         Path dir = Paths.get(SkypeDataPath);
-        new WatchDir(dir, true).processEvents();
 
+        new WatchDir(dir).processEvents();
+       // watchDir(dir, true).processEvents();
 
     }
 }

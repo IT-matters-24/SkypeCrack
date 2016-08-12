@@ -1,4 +1,4 @@
-package com.bjut.Util;/*
+package com.bjut.util;/*
  * Copyright (c) 2008, 2010, Oracle and/or its affiliates. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,6 +31,7 @@ package com.bjut.Util;/*
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -47,6 +48,7 @@ import static java.nio.file.StandardWatchEventKinds.*;
  * Example to watch a directory (or tree) for changes to files.
  */
 
+@Component
 public class WatchDir {
     private static Logger logger = LogManager.getLogger(WatchDir.class);
     private final WatchService watcher;
@@ -96,13 +98,14 @@ public class WatchDir {
         });
     }
 
+
     /**
      * Creates a WatchService and registers the given directory
      */
-    public WatchDir(Path dir, boolean recursive) throws IOException {
+    public WatchDir(Path dir) throws IOException {
         this.watcher = FileSystems.getDefault().newWatchService();
         this.keys = new HashMap<WatchKey, Path>();
-        this.recursive = recursive;
+        this.recursive = true;
 
         if (recursive) {
             System.out.format("Scanning %s ...\n", dir);
@@ -211,6 +214,6 @@ public class WatchDir {
 
         // register directory and process its events
         Path dir = Paths.get(args[dirArg]);
-        new WatchDir(dir, recursive).processEvents();
+       // new WatchDir(dir, recursive).processEvents();
     }
 }

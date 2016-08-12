@@ -8,7 +8,7 @@ import java.io.Serializable;
  */
  public class UserInfoBean implements Serializable {
 
-    private int end;
+    private Integer end;
 
     public UserInfoBean(int end) {
 
@@ -19,7 +19,7 @@ import java.io.Serializable;
         this.end = end;
     }
 
-    public int getEnd() {
+    public Integer getEnd() {
         return end;
     }
 

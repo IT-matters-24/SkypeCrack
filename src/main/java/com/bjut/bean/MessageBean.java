@@ -1,17 +1,9 @@
 package com.bjut.bean;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
-
 /**
  * Created by Administrator on 2016/8/4.
  */
-@XmlRootElement(name = "Customer")
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(propOrder = {"id", "author", "type",
-        "dialog_partner", "body_xml", "reason", "timestamp", "ip"})
+
 
 public class MessageBean {
     private int id;                        // ID号
@@ -20,7 +12,7 @@ public class MessageBean {
     private String dialog_partner;            // 接受方
     private String body_xml;                // 消息内容
     private String reason;                    //add by jiang
-    private int timestamp;                // 时间戳
+    private int timestamp__ms;                // 时间戳
     private String ip;                        // ip地址
 
     public int getId() {
@@ -71,12 +63,12 @@ public class MessageBean {
         this.reason = reason;
     }
 
-    public int getTimestamp() {
-        return timestamp;
+    public int getTimestamp__ms() {
+        return timestamp__ms;
     }
 
-    public void setTimestamp(int timestamp) {
-        this.timestamp = timestamp;
+    public void setTimestamp__ms(int timestamp__ms) {
+        this.timestamp__ms = timestamp__ms;
     }
 
     public String getIp() {
